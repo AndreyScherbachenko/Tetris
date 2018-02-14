@@ -11,21 +11,21 @@ package tetris;
  * @author Andrey
  */
 enum Orient{
-    _0,
-    _90,
-    _180,
-    _270;
+    W,
+    N,
+    E,
+    S;
     
     Orient next(){
         Orient res = this;
         switch (this){
-            case _0: res = _90;
+            case W: res = N;
                  break;
-            case _90: res = _180;
+            case N: res = E;
                  break;
-            case _180: res = _270;
+            case E: res = S;
                  break;
-            case _270: res = _0;
+            case S: res = W;
                  break;
         }
         return res;
@@ -34,13 +34,13 @@ enum Orient{
     Orient prev(){
         Orient res = this;
         switch (this){
-            case _0: res = _270;
+            case W: res = S;
                  break;
-            case _270: res = _180;
+            case S: res = E;
                  break;
-            case _180: res = _90;
+            case E: res = N;
                  break;
-            case _90: res = _0;
+            case N: res = W;
                  break;
         }
         return res;
@@ -50,39 +50,39 @@ enum Orient{
 }
 
 enum Block{
-    I(Orient._90, 1, 4,
+    I(Orient.N, 1, 4,
       new int[][]{{1},{1},{1},{1}}    
     ),
     O(null, 4, 4,
       new int[][]{{1,1},{1,1}}
     ),
-    J(Orient._90, 2, 3,
+    J(Orient.N, 2, 3,
       new int[][]{
           {0,1},
           {0,1},
           {1,1}              
       }
     ),
-    L(Orient._90, 2, 3,
+    L(Orient.N, 2, 3,
       new int[][]{
           {1,0},
           {1,0},
           {1,1}
       }
     ),
-    S(Orient._0, 3, 2,
+    S(Orient.W, 3, 2,
       new int[][]{
           {0,1,1},
           {1,1,0}
       }
     ),
-    Z(Orient._0, 3, 2,
+    Z(Orient.W, 3, 2,
       new int[][]{
           {1,1,0},
           {0,1,1}
       }
     ),
-    T(Orient._0, 3, 2,
+    T(Orient.W, 3, 2,
       new int[][]{
           {0,1,0},
           {1,1,1}
