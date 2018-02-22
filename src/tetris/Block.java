@@ -53,7 +53,7 @@ enum Block{
     I(Orient.N, 1, 4,
       new int[][]{{1},{1},{1},{1}}    
     ),
-    O(null, 4, 4,
+    O(null, 2, 2,
       new int[][]{{1,1},{1,1}}
     ),
     J(Orient.N, 2, 3,
@@ -101,7 +101,7 @@ enum Block{
         this.mask = mask;
     }
     
-    Block flipLeft(){
+    public Block flipLeft(){
        Block res = this;
        int[][] newmask = new int[this.w][this.h];
        for (int i=0; i<this.w; i++)
@@ -114,7 +114,7 @@ enum Block{
        return res;
     }
     
-    Block flipRiht(){
+    public Block flipRiht(){
        Block res = this;
        int[][] newmask = new int[this.w][this.h];
        for (int i=0; i<this.w; i++)
@@ -125,6 +125,18 @@ enum Block{
        res.h = w;
        res.mask = newmask;
        return res;
+    }
+    
+    public int[][] getMask(){        
+        return mask;
+    }
+    
+    public int getW(){        
+        return w;
+    }
+    
+    public int getH(){        
+        return h;
     }
 }
 
