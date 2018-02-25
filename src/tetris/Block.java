@@ -5,156 +5,213 @@
  */
 
 package tetris;
-
+import javafx.scene.paint.Color;
+import java.util.Random;
 /**
  *
  * @author Andrey
  */
-enum Orient{
-    W,
-    N,
-    E,
-    S;
+class Block {
+    public enum Orient{    
+        NORTH, EAST, SOUTH, WEST;
     
-    Orient next(){
-        Orient res = this;
-        switch (this){
-            case W: res = N;
-                 break;
-            case N: res = E;
-                 break;
-            case E: res = S;
-                 break;
-            case S: res = W;
-                 break;
+        Orient turnRight(){
+            Orient res = this;
+            switch (this){
+                case NORTH: res = EAST;
+                     break;
+                case EAST: res = SOUTH;
+                     break;
+                case SOUTH: res = WEST;
+                     break;
+                case WEST: res = NORTH;
+                     break;                                                
+            }
+            return res;
         }
-        return res;
+    
+        Orient turnLeft(){
+            Orient res = this;
+            switch (this){
+                case NORTH: res = WEST;
+                     break;
+                case WEST: res = SOUTH;
+                     break;
+                case SOUTH: res = EAST;
+                     break;
+                case EAST: res = NORTH;
+                     break;                
+            }
+            return res;
+        }        
     }
-    
-    Orient prev(){
-        Orient res = this;
-        switch (this){
-            case W: res = S;
-                 break;
-            case S: res = E;
-                 break;
-            case E: res = N;
-                 break;
-            case N: res = W;
-                 break;
-        }
-        return res;
-    }
-    
-    
-}
 
-enum Block{
-    I(Orient.N, 1, 4,
-      new int[][]{{1},{1},{1},{1}}    
-    ),
-    O(null, 2, 2,
-      new int[][]{{1,1},{1,1}}
-    ),
-    J(Orient.N, 2, 3,
-      new int[][]{
-          {0,1},
-          {0,1},
-          {1,1}              
-      }
-    ),
-    L(Orient.N, 2, 3,
-      new int[][]{
-          {1,0},
-          {1,0},
-          {1,1}
-      }
-    ),
-    S(Orient.W, 3, 2,
-      new int[][]{
-          {0,1,1},
-          {1,1,0}
-      }
-    ),
-    Z(Orient.W, 3, 2,
-      new int[][]{
-          {1,1,0},
-          {0,1,1}
-      }
-    ),
-    T(Orient.W, 3, 2,
-      new int[][]{
-          {0,1,0},
-          {1,1,1}
-      }
-    );
-    
-    private Orient[] orientations;
+    public enum Type{
+        I, O, J, L, S, Z, T
+    }
+           
+    private Type type;
     private Orient orient;
-    private int w, h;
-    private int[][] mask;
-    
-    Block(Orient orient, int w, int h, int[][] mask){
-        this.orient = orient;
-        this.w = w;
-        this.h = h;
-        this.mask = mask;
-    }
-    
-    public Block flipLeft(){
-       Block res = this;
-       int[][] newmask = new int[this.w][this.h];
-       for (int i=0; i<this.w; i++)
-           for (int j=0; j<this.h; j++)
-               newmask[i][j] = this.mask[j][i];
-       orient = orient.prev();
-       res.w = h;
-       res.h = w;
-       res.mask = newmask;
-       return res;
-    }
-    
-    public Block flipRiht(){
-       Block res = this;
-       int[][] newmask = new int[this.w][this.h];
-       for (int i=0; i<this.w; i++)
-           for (int j=0; j<this.h; j++)
-               newmask[i][j] = this.mask[j][i];
-       orient = orient.prev();
-       res.w = h;
-       res.h = w;
-       res.mask = newmask;
-       return res;
-    }
-    
-    public int[][] getMask(){        
-        return mask;
-    }
-    
-    public int getW(){        
-        return w;
-    }
-    
-    public int getH(){        
-        return h;
-    }
-}
-
-/*
-interface IBlock{
-    public boolean flipLeft();
-    public boolean flipRight();
-    public boolean moveLeft();
-    public boolean moveRight();
-    public boolean moveDown();
-}
-
-abstract class Block implements IBlock {
-    private int width = 0;
-    private int height = 0;
+    private int width = 0, height = 0;    
+    private int x = 0, y = 0;
     private int[][] mask = null;
+   
     
-    Block(BlockType type){
+    private Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.BROWN, Color.GRAY, Color.PINK};
+    private Random random = new Random();
+    private Color color = getRandomColor();
+    
+    public Block(Type type, Orient orient){
+        this.type = type;
+        this.orient = orient;
+        
+        switch(type){
+            case I:
+                switch(orient){
+                    case NORTH: case SOUTH:
+                        this.width=1; this.height=4;
+                        this.mask=new int[][]{{1},{1},{1},{1}}; 
+                        break;
+                    case EAST: case WEST:
+                        this.width=4; this.height=1;
+                        this.mask=new int[][]{{1, 1, 1, 1}}; 
+                        break;                                        
+                }
+                break;
+            case O:
+                switch(orient){
+                    case NORTH: case EAST: case SOUTH: case WEST:
+                        this.width=2; this.height=2;
+                        this.mask=new int[][]{{1,1},{1,1}};
+                        break;
+                }
+                break;        
+            case J:
+                switch(orient){
+                    case NORTH:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{0,1},
+                                              {0,1},
+                                              {1,1}};
+                        break;
+                    case EAST:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{1,0,0},
+                                              {1,1,1}};
+                        break;
+                    case SOUTH:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{1,1},
+                                              {1,0},
+                                              {1,0}};
+                        break;
+                    case WEST:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{1,1,1},
+                                              {0,0,1}};
+                }                
+                break;            
+            case L:
+                switch(orient){
+                    case NORTH:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{1,0},
+                                              {1,0},
+                                              {1,1}};
+                        break;
+                    case EAST:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{1,1,1},
+                                              {1,0,0}};
+                        break;
+                    case SOUTH:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{1,1},
+                                              {0,1},
+                                              {0,1}};
+                        break;
+                    case WEST:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{0,0,1},
+                                              {1,1,1}};
+                }
+                break;
+            case S:
+                switch(orient){
+                    case NORTH: case SOUTH:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{0,1,1},
+                                              {1,1,0}};
+                        break;
+                    case EAST: case WEST:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{1,0},
+                                              {1,1},
+                                              {0,1}};
+                        break;                    
+                }
+                break;    
+            case Z:
+                switch(orient){
+                    case NORTH: case SOUTH:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{1,1,0},
+                                              {0,1,1}};
+                        break;
+                    case EAST: case WEST:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{0,1},
+                                              {1,1},
+                                              {1,0}};
+                        break;
+                }
+                break;    
+            case T:
+                switch(orient){
+                    case NORTH:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{0,1,0},
+                                              {1,1,1}};
+                        break;
+                    case EAST:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{1,0},
+                                              {1,1},
+                                              {1,0}};
+                        break;
+                    case SOUTH:
+                        this.width=3; this.height=2;
+                        this.mask=new int[][]{{1,1,1},
+                                              {0,1,0}};
+                        break;
+                    case WEST:
+                        this.width=2; this.height=3;
+                        this.mask=new int[][]{{0,1},
+                                              {1,1},
+                                              {0,1}};
+                }
+                break;    
+        }            
+    }
+    
+    public int getWidth(){
+        return this.width;
+    }
+    
+    public int getHeight(){
+        return this.height;
+    }
+    
+    public int[][] getMask(){
+        return this.mask;
+    }
+    
+    private Color getRandomColor(){        
+        return this.colors[random.nextInt(this.colors.length)];
+    }
+    
+    public Color getColor(){
+        return this.color;
     }
     
     public boolean flipLeft(){return false;};
@@ -164,5 +221,3 @@ abstract class Block implements IBlock {
     public boolean moveDown(){return false;};
     
 }
-*/
-

@@ -34,12 +34,12 @@ import java.util.List;
  */
 public class Tetris extends Application implements EventHandler<ActionEvent> {
     
-    private ComboBox<Block> listOfBlock = new ComboBox<Block>();        
-    private ComboBox<Orient> listOfOrient = new ComboBox<Orient>();
+    private ComboBox<Block.Type> listOfBlock = new ComboBox<Block.Type>();        
+    private ComboBox<Block.Orient> listOfOrient = new ComboBox<Block.Orient>();
     private Block block = null;
     private Button[][] btnField = new Button[20][10];
     private int w = 10, h = 20; 
-    private List<BackgroundFill> orgFills;
+    private Background background;
    
     @Override
     public void start(Stage primaryStage) {
@@ -47,35 +47,37 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         Pane leftPane = new Pane();
         VBox rightPane = new VBox();
         rightPane.setAlignment(Pos.CENTER);        
-                        
+        background = new Background(new BackgroundFill(Color.web("#BBB"), CornerRadii.EMPTY, Insets.EMPTY));        
+        
         double h = 20, w = 20;
         for (int i=0;i<this.h;i++)
             for (int j=0; j<this.w; j++){
                 Button b = new Button();
                 b.setPrefSize(w, h);
-                btnField[i][j] = b;
+                b.setBackground(background);
+                btnField[i][j] = b;                
                 leftPane.getChildren().add(b);
-                b.relocate(j*w+j*0.5,i*h+i*4.5);
+                b.relocate(j*w+j*0.5,i*h+i*5.5);
             }        
                 
-        for (Block b:Block.values()){
+        for (Block.Type b:Block.Type.values()){
             listOfBlock.getItems().add(b);
         }
         listOfBlock.setOnAction(this);
                 
-        for (Orient o:Orient.values()){
+        for (Block.Orient o:Block.Orient.values()){
             listOfOrient.getItems().add(o);
         }       
         listOfOrient.setOnAction(this);
         rightPane.getChildren().addAll(listOfBlock, listOfOrient);
-        
-                
+                        
         h = 520;        
         int leftWidth = (int)(w*10+w*0.5);
         leftPane.setBackground(new Background(new BackgroundFill(Color.web("#DDF"), CornerRadii.EMPTY, Insets.EMPTY)));
         leftPane.setPrefSize(leftWidth,h);
-        leftPane.relocate(0,0);
-        orgFills = btnField[0][0].getBackground().getFills();
+        leftPane.relocate(0,0);          
+        
+        
         
         int rightWidth = 200; 
         rightPane.setBackground(new Background(new BackgroundFill(Color.web("#EFE"), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -101,22 +103,29 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e){
         if  (e.getSource()== listOfBlock){
-            block = listOfBlock.getValue();
+            
         } else if (e.getSource()== listOfOrient){
-            System.out.println("oooo");
+            
         }
         
+        Block.Type type = listOfBlock.getValue();
+        Block.Orient orient = listOfOrient.getValue();
+        System.out.println(type+":"+orient);
+        if (type != null && orient != null){            
+        block = new Block(type, orient);
         
         for (int i=0; i<this.h; i++)
             for (int j=0;j<this.w;j++)
-                btnField[i][j].setBackground(orgFills.toArray(new BackgroundFill[0]));
-        
+                btnField[i][j].setBackground(background);
+               
+        int w = block.getWidth(); 
+        int h = block.getHeight();
         int[][] mask = block.getMask();
-        int w = block.getW(), h = block.getH();
         for (int i=0; i<h; i++)
             for (int j=0;j<w;j++)
                 if (mask[i][j] == 1) {
-                    btnField[i][j].setBackground(new Background(new BackgroundFill(Color.web("#FDFD"), CornerRadii.EMPTY, Insets.EMPTY)));
+                    btnField[i][j].setBackground(new Background(new BackgroundFill(block.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
                 }
+        }
     }
 }
