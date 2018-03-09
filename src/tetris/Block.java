@@ -5,6 +5,7 @@
  */
 
 package tetris;
+import java.util.Collection;
 import javafx.scene.paint.Color;
 import java.util.Random;
 /**
@@ -49,21 +50,46 @@ class Block {
     public enum Type{
         I, O, J, L, S, Z, T
     }
+    
+    public enum BlockColor{
+        RED(Color.RED), 
+        BLUE(Color.BLUE),
+        GREEN(Color.GREEN),
+        YELLOW(Color.YELLOW), 
+        BROWN(Color.BROWN), 
+        GRAY(Color.GRAY),
+        PINK(Color.PINK);
+        
+        private Color color;
+        private static Random random = new Random();
+        private static final BlockColor[] VALUES = values();
+        private static final int length = VALUES.length;
+        
+        public static BlockColor random(){            
+           return VALUES[random.nextInt(length)]; 
+        }
+        
+        BlockColor(Color color){
+            this.color = color;
+        }
+        
+        Color getColor(){
+            return this.color;
+        }        
+    }
            
     private Type type;
     private Orient orient;
     private int width = 0, height = 0;    
     private int x = 0, y = 0;
     private int[][] mask = null;
-   
-    
-    private Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.BROWN, Color.GRAY, Color.PINK};
-    private Random random = new Random();
-    private Color color = getRandomColor();
+           
+    public BlockColor color = null;
     
     public Block(Type type, Orient orient){
         this.type = type;
         this.orient = orient;
+        this.color = BlockColor.random();
         
         switch(type){
             case I:
@@ -205,12 +231,8 @@ class Block {
     public int[][] getMask(){
         return this.mask;
     }
-    
-    private Color getRandomColor(){        
-        return this.colors[random.nextInt(this.colors.length)];
-    }
-    
-    public Color getColor(){
+        
+    public BlockColor getColor(){
         return this.color;
     }
     

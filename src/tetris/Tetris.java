@@ -13,9 +13,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -124,7 +121,7 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         for (int i=0; i<h; i++)
             for (int j=0;j<w;j++)
                 if (mask[i][j] == 1) {
-                    btnField[i][j].setBackground(new Background(new BackgroundFill(block.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+                    btnField[i][j].setBackground(new Background(new BackgroundFill(block.color.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
                 }
         }
     }
