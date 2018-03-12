@@ -33,30 +33,72 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
     
     private ComboBox<Block.Type> listOfBlock = new ComboBox<Block.Type>();        
     private ComboBox<Block.Orient> listOfOrient = new ComboBox<Block.Orient>();
-    private Block block = null;
-    private Button[][] btnField = new Button[20][10];
-    private int w = 10, h = 20; 
-    private Background background;
+    private Block block = null;    
+    private final int cellRows = 20, cellColumns = 10;
+    private final Button[][] btnField = new Button[cellRows][cellColumns];
+    private final int cellHintRows = 3*4, cellHintColumns = 4;
+    private final Button[][] btnHintField = new Button[cellHintRows][cellHintColumns];
+    private final Background background = new Background(new BackgroundFill(Color.web("#BBB"), CornerRadii.EMPTY, Insets.EMPTY));
    
     @Override
     public void start(Stage primaryStage) {
+        
+        double cellWidth = 20, cellHeight = 20;
+                
+        double sceneHeight = 520;
+        double leftPaneWidth = (cellWidth*cellColumns+cellWidth*0.5);
+        double rightPaneWidth = 200;
+        double rightTopPaneHeight = (cellHeight*cellHintRows+cellHeight*3.5);
+        double rightBottomPaneHeight = sceneHeight-rightTopPaneHeight;
+        double sceneWidth = leftPaneWidth+rightPaneWidth;        
+        
         Pane root = new Pane();
         Pane leftPane = new Pane();
-        VBox rightPane = new VBox();
-        rightPane.setAlignment(Pos.CENTER);        
-        background = new Background(new BackgroundFill(Color.web("#BBB"), CornerRadii.EMPTY, Insets.EMPTY));        
+        Pane rightPane = new Pane();
+        Pane rightTopPane = new Pane();
+        VBox rightBottomPane = new VBox();
         
-        double h = 20, w = 20;
-        for (int i=0;i<this.h;i++)
-            for (int j=0; j<this.w; j++){
+        
+        leftPane.setBackground(new Background(new BackgroundFill(Color.web("#DDF"), CornerRadii.EMPTY, Insets.EMPTY)));
+        rightPane.setBackground(new Background(new BackgroundFill(Color.web("#DDF"), CornerRadii.EMPTY, Insets.EMPTY)));
+        rightTopPane.setBackground(new Background(new BackgroundFill(Color.web("#DDF"), CornerRadii.EMPTY, Insets.EMPTY)));
+        rightBottomPane.setBackground(new Background(new BackgroundFill(Color.web("#BBF"), CornerRadii.EMPTY, Insets.EMPTY)));
+        
+        leftPane.setPrefSize(leftPaneWidth, sceneHeight);
+        leftPane.relocate(0,0);
+        
+        rightPane.setPrefSize(rightPaneWidth, sceneHeight);
+        rightPane.relocate(leftPaneWidth,0);
+        
+        rightTopPane.setPrefSize(rightPaneWidth, rightTopPaneHeight);
+        rightTopPane.relocate(0,0);        
+        
+        rightBottomPane.setPrefSize(rightPaneWidth, rightBottomPaneHeight);
+        rightBottomPane.relocate(0,rightTopPaneHeight);
+        rightBottomPane.setAlignment(Pos.CENTER);
+        
+        rightPane.getChildren().addAll(rightTopPane,rightBottomPane);
+               
+        for (int i=0;i<cellRows;i++)
+            for (int j=0; j<cellColumns; j++){
                 Button b = new Button();
-                b.setPrefSize(w, h);
+                b.setPrefSize(cellWidth, cellHeight);
                 b.setBackground(background);
-                btnField[i][j] = b;                
-                leftPane.getChildren().add(b);
-                b.relocate(j*w+j*0.5,i*h+i*5.5);
-            }        
-                
+                btnField[i][j] = b;           
+                b.relocate(j*cellWidth+j*0.5,i*cellHeight+i*5.5);
+                leftPane.getChildren().add(b);                
+            }                
+        
+        for (int i=0;i<cellHintRows;i++)
+            for (int j=0; j<cellHintColumns; j++){
+                Button b = new Button();
+                b.setPrefSize(cellWidth, cellHeight);
+                b.setBackground(background);
+                btnHintField[i][j] = b;           
+                b.relocate(j*cellWidth+j*0.5,i*cellHeight+i*5.5);
+                rightTopPane.getChildren().add(b);                
+            }  
+        
         for (Block.Type b:Block.Type.values()){
             listOfBlock.getItems().add(b);
         }
@@ -66,24 +108,10 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
             listOfOrient.getItems().add(o);
         }       
         listOfOrient.setOnAction(this);
-        rightPane.getChildren().addAll(listOfBlock, listOfOrient);
-                        
-        h = 520;        
-        int leftWidth = (int)(w*10+w*0.5);
-        leftPane.setBackground(new Background(new BackgroundFill(Color.web("#DDF"), CornerRadii.EMPTY, Insets.EMPTY)));
-        leftPane.setPrefSize(leftWidth,h);
-        leftPane.relocate(0,0);          
-        
-        
-        
-        int rightWidth = 200; 
-        rightPane.setBackground(new Background(new BackgroundFill(Color.web("#EFE"), CornerRadii.EMPTY, Insets.EMPTY)));
-        rightPane.setPrefSize(rightWidth, h);
-        rightPane.relocate(leftWidth,0);
-        root.getChildren().add(leftPane);
-        root.getChildren().add(rightPane);
-        
-        Scene scene = new Scene(root, 400, h);
+        rightBottomPane.getChildren().addAll(listOfBlock, listOfOrient);
+                                       
+        root.getChildren().addAll(leftPane, rightPane);                
+        Scene scene = new Scene(root, sceneWidth, sceneHeight);
                         
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
@@ -108,21 +136,22 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         Block.Type type = listOfBlock.getValue();
         Block.Orient orient = listOfOrient.getValue();
         System.out.println(type+":"+orient);
-        if (type != null && orient != null){            
-        block = new Block(type, orient);
+        if (type != null && orient != null) {            
+            block = new Block(type, orient);
         
-        for (int i=0; i<this.h; i++)
-            for (int j=0;j<this.w;j++)
-                btnField[i][j].setBackground(background);
+            for (int i=0; i<this.cellRows; i++)
+                for (int j=0;j<this.cellColumns;j++)
+                    btnField[i][j].setBackground(background);
                
-        int w = block.getWidth(); 
-        int h = block.getHeight();
-        int[][] mask = block.getMask();
-        for (int i=0; i<h; i++)
-            for (int j=0;j<w;j++)
-                if (mask[i][j] == 1) {
-                    btnField[i][j].setBackground(new Background(new BackgroundFill(block.color.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
-                }
+            int w = block.getWidth(); 
+            int h = block.getHeight();
+            int[][] mask = block.getMask();
+            
+            for (int i=0; i<h; i++)
+                for (int j=0;j<w;j++)
+                    if (mask[i][j] == 1) {
+                        btnField[i][j].setBackground(new Background(new BackgroundFill(block.color.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+                    }
         }
     }
 }

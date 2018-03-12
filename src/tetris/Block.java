@@ -61,6 +61,7 @@ class Block {
         PINK(Color.PINK);
         
         private Color color;
+        
         private static Random random = new Random();
         private static final BlockColor[] VALUES = values();
         private static final int length = VALUES.length;
