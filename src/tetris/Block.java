@@ -8,6 +8,7 @@ package tetris;
 import java.util.Collection;
 import javafx.scene.paint.Color;
 import java.util.Random;
+import tetris.util.*;
 /**
  *
  * @author Andrey
@@ -15,7 +16,9 @@ import java.util.Random;
 class Block {
     public enum Orient{    
         NORTH, EAST, SOUTH, WEST;
-    
+        
+        private static final EnumRandom<Orient> RND = new EnumRandom<Orient>(Orient.class);   
+        
         Orient turnRight(){
             Orient res = this;
             switch (this){
@@ -44,11 +47,21 @@ class Block {
                      break;                
             }
             return res;
-        }        
+        }
+        
+        public static Orient random(){            
+           return RND.random(); 
+        }
     }
 
     public enum Type{
-        I, O, J, L, S, Z, T
+        I, O, J, L, S, Z, T;
+        
+        private static final EnumRandom<Type> RND = new EnumRandom<Type>(Type.class);   
+        
+        public static Type random(){            
+           return RND.random(); 
+        }
     }
     
     public enum BlockColor{
@@ -62,12 +75,10 @@ class Block {
         
         private Color color;
         
-        private static Random random = new Random();
-        private static final BlockColor[] VALUES = values();
-        private static final int length = VALUES.length;
+        private static final EnumRandom<BlockColor> RND = new EnumRandom<BlockColor>(BlockColor.class);        
         
         public static BlockColor random(){            
-           return VALUES[random.nextInt(length)]; 
+           return RND.random(); 
         }
         
         BlockColor(Color color){
@@ -78,6 +89,8 @@ class Block {
             return this.color;
         }        
     }
+    
+    
            
     private Type type;
     private Orient orient;
