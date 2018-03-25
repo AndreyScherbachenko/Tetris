@@ -5,15 +5,13 @@
  */
 
 package tetris;
-import java.util.Collection;
 import javafx.scene.paint.Color;
-import java.util.Random;
 import tetris.util.*;
 /**
  *
  * @author Andrey
  */
-class Block {
+public class Block {
     public enum Orient{    
         NORTH, EAST, SOUTH, WEST;
         
@@ -100,10 +98,14 @@ class Block {
            
     public BlockColor color = null;
     
-    public Block(Type type, Orient orient){
+    public Block(){
+        this(Block.Type.random(), Block.Orient.random(), Block.BlockColor.random());
+    }
+    
+    public Block(Type type, Orient orient, BlockColor color){
         this.type = type;
         this.orient = orient;
-        this.color = BlockColor.random();
+        this.color = color;
         
         switch(type){
             case I:
@@ -232,8 +234,8 @@ class Block {
                 }
                 break;    
         }            
-    }
-    
+    }    
+            
     public int getWidth(){
         return this.width;
     }

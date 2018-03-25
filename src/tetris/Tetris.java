@@ -6,7 +6,6 @@
 package tetris;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,12 +16,10 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
-import java.util.List;
 
 
 /**
@@ -36,19 +33,22 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
     private Block block = null;    
     private final int cellRows = 20, cellColumns = 10;
     private final Button[][] btnField = new Button[cellRows][cellColumns];
-    private final int cellHintRows = 3*4, cellHintColumns = 4;
+    private final int cellHintRows = 3+3*4, cellHintColumns = 4;
     private final Button[][] btnHintField = new Button[cellHintRows][cellHintColumns];
     private final Background background = new Background(new BackgroundFill(Color.web("#BBB"), CornerRadii.EMPTY, Insets.EMPTY));
    
+    private BlockQueue blockQueue = new BlockQueue();
+    
     @Override
     public void start(Stage primaryStage) {
         
         double cellWidth = 20, cellHeight = 20;
+        double cellHintWidth = 10, cellHintHeight = 10;
                 
         double sceneHeight = 520;
         double leftPaneWidth = (cellWidth*cellColumns+cellWidth*0.5);
         double rightPaneWidth = 200;
-        double rightTopPaneHeight = (cellHeight*cellHintRows+cellHeight*3.5);
+        double rightTopPaneHeight = (cellHintHeight*cellHintRows+cellHintHeight*24);
         double rightBottomPaneHeight = sceneHeight-rightTopPaneHeight;
         double sceneWidth = leftPaneWidth+rightPaneWidth;        
         
@@ -56,8 +56,7 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         Pane leftPane = new Pane();
         Pane rightPane = new Pane();
         Pane rightTopPane = new Pane();
-        VBox rightBottomPane = new VBox();
-        
+        VBox rightBottomPane = new VBox();        
         
         leftPane.setBackground(new Background(new BackgroundFill(Color.web("#DDF"), CornerRadii.EMPTY, Insets.EMPTY)));
         rightPane.setBackground(new Background(new BackgroundFill(Color.web("#DDF"), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -92,10 +91,10 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         for (int i=0;i<cellHintRows;i++)
             for (int j=0; j<cellHintColumns; j++){
                 Button b = new Button();
-                b.setPrefSize(cellWidth, cellHeight);
+                b.setPrefSize(cellHintWidth, cellHintHeight);
                 b.setBackground(background);
                 btnHintField[i][j] = b;           
-                b.relocate(j*cellWidth+j*0.5,i*cellHeight+i*5.5);
+                b.relocate(j*cellHintWidth+j*6.5,i*cellHintHeight+i*15.5);
                 rightTopPane.getChildren().add(b);                
             }  
         
@@ -115,7 +114,9 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
                         
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
-        primaryStage.show();                
+        primaryStage.show(); 
+        
+        tetrisStart();
     }
 
     /**
@@ -137,7 +138,7 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         Block.Orient orient = listOfOrient.getValue();
         System.out.println(type+":"+orient);
         if (type != null && orient != null) {            
-            block = new Block(type, orient);
+            block = new Block(type, orient, Block.BlockColor.random());
         
             for (int i=0; i<this.cellRows; i++)
                 for (int j=0;j<this.cellColumns;j++)
@@ -154,4 +155,17 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
                     }
         }
     }
+    
+    private void tetrisStart(){
+        this.blockQueue.add2Queue();
+        this.blockQueue.add2Queue();
+        this.blockQueue.add2Queue();                
+    }
+    
+    private void showBlockQueue(){
+        int offsetX = 0, offsetY = 0;
+        for(Block b:this.blockQueue.getAll()){
+            
+        }
+    } 
 }
