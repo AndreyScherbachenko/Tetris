@@ -21,21 +21,25 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 
-
 /**
  *
  * @author Andrey
  */
 public class Tetris extends Application implements EventHandler<ActionEvent> {
     
+    private final int CELL_ROWS = 20, CELL_COLUMNS = 10;
+    private final int CELL_HINT_ROWS = 3+3*4, CELL_HINT_COLUMNS = 4;
+    private final Background background = new Background(new BackgroundFill(Color.web("#CCC"), CornerRadii.EMPTY, Insets.EMPTY));
+    
     private ComboBox<Block.Type> listOfBlock = new ComboBox<Block.Type>();        
     private ComboBox<Block.Orient> listOfOrient = new ComboBox<Block.Orient>();
+    private Button refreshBlockQueue = new Button();
     private Block block = null;    
-    private final int cellRows = 20, cellColumns = 10;
-    private final Button[][] btnField = new Button[cellRows][cellColumns];
-    private final int cellHintRows = 3+3*4, cellHintColumns = 4;
-    private final Button[][] btnHintField = new Button[cellHintRows][cellHintColumns];
-    private final Background background = new Background(new BackgroundFill(Color.web("#BBB"), CornerRadii.EMPTY, Insets.EMPTY));
+    
+    private final Pane[][] field = new Pane[CELL_ROWS][CELL_COLUMNS];
+    
+    private final Pane[][] hintField = new Pane[CELL_HINT_ROWS][CELL_HINT_COLUMNS];
+    
    
     private BlockQueue blockQueue = new BlockQueue();
     
@@ -45,10 +49,10 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         double cellWidth = 20, cellHeight = 20;
         double cellHintWidth = 10, cellHintHeight = 10;
                 
-        double sceneHeight = 520;
-        double leftPaneWidth = (cellWidth*cellColumns+cellWidth*0.5);
+        double sceneHeight = CELL_ROWS*cellHeight+cellHeight*1;
+        double leftPaneWidth = (cellWidth*CELL_COLUMNS+cellWidth*0.5);
         double rightPaneWidth = 200;
-        double rightTopPaneHeight = (cellHintHeight*cellHintRows+cellHintHeight*24);
+        double rightTopPaneHeight = (cellHintHeight*CELL_HINT_ROWS+cellHintHeight*1.5);
         double rightBottomPaneHeight = sceneHeight-rightTopPaneHeight;
         double sceneWidth = leftPaneWidth+rightPaneWidth;        
         
@@ -78,25 +82,28 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         
         rightPane.getChildren().addAll(rightTopPane,rightBottomPane);
                
-        for (int i=0;i<cellRows;i++)
-            for (int j=0; j<cellColumns; j++){
-                Button b = new Button();
-                b.setPrefSize(cellWidth, cellHeight);
-                b.setBackground(background);
-                btnField[i][j] = b;           
-                b.relocate(j*cellWidth+j*0.5,i*cellHeight+i*5.5);
-                leftPane.getChildren().add(b);                
+        for (int i=0;i<CELL_ROWS;i++)
+            for (int j=0; j<CELL_COLUMNS; j++){
+                Pane p = new Pane();
+                p.setPrefSize(cellWidth, cellHeight);
+                p.setBackground(background);
+                field[i][j] = p;           
+                p.relocate(j*cellWidth+j*1,i*cellHeight+i*1);
+                leftPane.getChildren().add(p);                
             }                
         
-        for (int i=0;i<cellHintRows;i++)
-            for (int j=0; j<cellHintColumns; j++){
-                Button b = new Button();
-                b.setPrefSize(cellHintWidth, cellHintHeight);
-                b.setBackground(background);
-                btnHintField[i][j] = b;           
-                b.relocate(j*cellHintWidth+j*6.5,i*cellHintHeight+i*15.5);
-                rightTopPane.getChildren().add(b);                
+        for (int i=0;i<CELL_HINT_ROWS;i++)
+            for (int j=0; j<CELL_HINT_COLUMNS; j++){
+                Pane p = new Pane();
+                p.setPrefSize(cellHintWidth, cellHintHeight);
+                p.setBackground(background);
+                hintField[i][j] = p;           
+                p.relocate(j*cellHintWidth+j*1,i*cellHintHeight+i*1);
+                rightTopPane.getChildren().add(p);
             }  
+        
+        refreshBlockQueue.setText("Refresh blocks queue");
+        refreshBlockQueue.setOnAction(this);
         
         for (Block.Type b:Block.Type.values()){
             listOfBlock.getItems().add(b);
@@ -107,7 +114,7 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
             listOfOrient.getItems().add(o);
         }       
         listOfOrient.setOnAction(this);
-        rightBottomPane.getChildren().addAll(listOfBlock, listOfOrient);
+        rightBottomPane.getChildren().addAll(refreshBlockQueue, listOfBlock, listOfOrient);
                                        
         root.getChildren().addAll(leftPane, rightPane);                
         Scene scene = new Scene(root, sceneWidth, sceneHeight);
@@ -131,18 +138,16 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
         if  (e.getSource()== listOfBlock){
             
         } else if (e.getSource()== listOfOrient){
-            
-        }
-        
+                            
         Block.Type type = listOfBlock.getValue();
         Block.Orient orient = listOfOrient.getValue();
         System.out.println(type+":"+orient);
         if (type != null && orient != null) {            
             block = new Block(type, orient, Block.BlockColor.random());
         
-            for (int i=0; i<this.cellRows; i++)
-                for (int j=0;j<this.cellColumns;j++)
-                    btnField[i][j].setBackground(background);
+            for (int i=0; i<this.CELL_ROWS; i++)
+                for (int j=0;j<this.CELL_COLUMNS;j++)
+                    field[i][j].setBackground(background);
                
             int w = block.getWidth(); 
             int h = block.getHeight();
@@ -151,21 +156,35 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
             for (int i=0; i<h; i++)
                 for (int j=0;j<w;j++)
                     if (mask[i][j] == 1) {
-                        btnField[i][j].setBackground(new Background(new BackgroundFill(block.color.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+                        field[i][j].setBackground(new Background(new BackgroundFill(block.color.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
                     }
+        } 
+       } else if (e.getSource()== refreshBlockQueue){
+            this.blockQueue.resetQueue();                
+            showBlockQueue();
         }
     }
     
     private void tetrisStart(){
-        this.blockQueue.add2Queue();
-        this.blockQueue.add2Queue();
-        this.blockQueue.add2Queue();                
+        this.blockQueue.resetQueue();                
+        showBlockQueue();
     }
     
     private void showBlockQueue(){
+        for (int i=0; i<this.CELL_HINT_ROWS; i++)
+            for (int j=0;j<this.CELL_HINT_COLUMNS;j++)
+                hintField[i][j].setBackground(background);
+        
         int offsetX = 0, offsetY = 0;
+        for(Block b:this.blockQueue.getAll())
+            offsetY+=b.getHeight()+1;
+        
+        offsetY = Math.round(CELL_HINT_ROWS/2- offsetY/2);                        
+        
         for(Block b:this.blockQueue.getAll()){
-            
+            offsetX = Math.round(CELL_HINT_COLUMNS/2- b.getWidth()/2);                        
+            b.draw(hintField, offsetX, offsetY);            
+            offsetY+=b.getHeight()+1;
         }
     } 
 }

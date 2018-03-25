@@ -37,4 +37,11 @@ public class BlockQueue {
   public LinkedList<Block> getAll(){
       return new LinkedList<Block>(this.list);
   }
+  
+  public void resetQueue(){
+      list.clear();
+      add2Queue();
+      add2Queue();
+      add2Queue();  
+  }
 }

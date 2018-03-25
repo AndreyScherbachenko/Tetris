@@ -5,8 +5,13 @@
  */
 
 package tetris;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import tetris.util.*;
+import javafx.scene.layout.Pane;
 /**
  *
  * @author Andrey
@@ -69,9 +74,9 @@ public class Block {
         YELLOW(Color.YELLOW), 
         BROWN(Color.BROWN), 
         GRAY(Color.GRAY),
-        PINK(Color.PINK);
+        PINK(Color.SANDYBROWN);
         
-        private Color color;
+        private final Color color;
         
         private static final EnumRandom<BlockColor> RND = new EnumRandom<BlockColor>(BlockColor.class);        
         
@@ -92,8 +97,7 @@ public class Block {
            
     private Type type;
     private Orient orient;
-    private int width = 0, height = 0;    
-    private int x = 0, y = 0;
+    private int width = 0, height = 0;        
     private int[][] mask = null;
            
     public BlockColor color = null;
@@ -250,6 +254,14 @@ public class Block {
         
     public BlockColor getColor(){
         return this.color;
+    }
+    
+    public void draw(Pane[][] field, int offsetX, int offsetY){        
+        for (int i=0; i<this.height; i++)
+                for (int j=0;j<this.width;j++)
+                    if (this.mask[i][j] == 1) {
+                        field[offsetY+i][offsetX+j].setBackground(new Background(new BackgroundFill(this.color.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+                    }
     }
     
     public boolean flipLeft(){return false;};
