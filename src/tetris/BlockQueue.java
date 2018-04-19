@@ -34,10 +34,11 @@ public class BlockQueue {
     public LinkedList<Block> getAll() {
         return new LinkedList<Block>(this.list);
     }
-
-    public Block getFirst() {
-        Block r = list.getFirst();
-        list.removeFirst();
+    
+    public Block getFirstAndPutRandomLast() {
+        Block r = list.getLast();
+        list.removeLast();
+        list.addFirst(new Block());
         return r;
     }
 

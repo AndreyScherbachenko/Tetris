@@ -34,6 +34,7 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
     private ComboBox<Block.Type> listOfBlock = new ComboBox<Block.Type>();
     private ComboBox<Block.Orient> listOfOrient = new ComboBox<Block.Orient>();
     private Button refreshBlockQueue = new Button();
+    private Button nextBlockQueue = new Button();
     private Block block = null;
 
     private final Pane[][] field = new Pane[CELL_ROWS][CELL_COLUMNS];
@@ -92,19 +93,24 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
             }
         }
 
+        double offset =  rightPaneWidth - (CELL_HINT_COLUMNS * cellHintWidth + CELL_HINT_COLUMNS);
+        offset = offset /2;
         for (int i = 0; i < CELL_HINT_ROWS; i++) {
             for (int j = 0; j < CELL_HINT_COLUMNS; j++) {
                 Pane p = new Pane();
                 p.setPrefSize(cellHintWidth, cellHintHeight);
                 p.setBackground(background);
                 hintField[i][j] = p;
-                p.relocate(j * cellHintWidth + j * 1, i * cellHintHeight + i * 1);
+                p.relocate(j * cellHintWidth + j * 1 + offset, i * cellHintHeight + i * 1);
                 rightTopPane.getChildren().add(p);
             }
         }
 
         refreshBlockQueue.setText("Refresh blocks queue");
         refreshBlockQueue.setOnAction(this);
+        
+        nextBlockQueue.setText("Next block in the queue");
+        nextBlockQueue.setOnAction(this);
 
         for (Block.Type b : Block.Type.values()) {
             listOfBlock.getItems().add(b);
@@ -115,7 +121,7 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
             listOfOrient.getItems().add(o);
         }
         listOfOrient.setOnAction(this);
-        rightBottomPane.getChildren().addAll(refreshBlockQueue, listOfBlock, listOfOrient);
+        rightBottomPane.getChildren().addAll(refreshBlockQueue, nextBlockQueue, listOfBlock, listOfOrient);
 
         root.getChildren().addAll(leftPane, rightPane);
         Scene scene = new Scene(root, sceneWidth, sceneHeight);
@@ -166,6 +172,9 @@ public class Tetris extends Application implements EventHandler<ActionEvent> {
             }
         } else if (e.getSource() == refreshBlockQueue) {
             this.blockQueue.resetQueue();
+            showBlockQueue();
+        } else if (e.getSource() == nextBlockQueue) {
+            this.blockQueue.getFirstAndPutRandomLast();
             showBlockQueue();
         }
     }
